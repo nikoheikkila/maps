@@ -14,10 +14,20 @@ bun install                    # Install dependencies
 bun run index.ts              # Run the main entry point
 ```
 
+**Build:**
+```bash
+bun run build                 # Build both TypeScript and bundled outputs
+bun run build:ts              # Build TypeScript declarations only
+bun run build:bundle          # Build bundled ESM/CJS outputs only
+bun run clean                 # Clean dist and coverage directories
+```
+
 **Code Quality:**
 ```bash
-bunx biome check              # Lint and format check
-bunx biome check --write      # Auto-fix linting and formatting issues (also available as `bun format`)
+bun run lint                  # Lint check (alias for bunx biome check)
+bun run format                # Auto-fix linting and formatting issues
+bunx biome check              # Direct Biome lint and format check
+bunx biome check --write      # Direct Biome auto-fix
 ```
 
 **Testing:**
@@ -54,13 +64,15 @@ This is a TypeScript library built with Bun that provides specialized data struc
 
 ## Development Environment
 
-**Runtime:** Bun v1.2.22+ (JavaScript runtime and package manager)
+**Runtime:** Bun v1.0.0+ (JavaScript runtime and package manager)
 **Language:** TypeScript with ES modules
-**Formatting:** Biome with tab indentation and double quotes
+**Formatting:** Biome v2.2.6 with tab indentation and double quotes
 **Testing:** Bun's built-in test runner
 
 **Key Configuration:**
-- TypeScript target: ESNext with bundler module resolution
+- TypeScript target: ES2022 with module preservation for development
+- Build target: ES2022 with ESNext modules for library output
 - Biome configured for tabs, double quotes, organize imports
 - Non-null assertions disabled in linting
 - Coverage reports generated to `coverage/` directory
+- Supports both CJS and ESM outputs for publishing
