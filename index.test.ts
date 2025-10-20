@@ -35,4 +35,13 @@ describe('Time Series Map', () => {
     expect(key).toBe(expectedKey);
     expect(map.get(key)).toBe(expectedValue);
   });
+
+  it('clears the map', () => {
+    const map = new TimeSeriesMap();
+    map.add('data');
+
+    map.clear();
+
+    expect(map.size).toBe(0);
+  });
 });
