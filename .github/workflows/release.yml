@@ -60,18 +60,6 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
-      - name: Debug npm configuration
-        run: |
-          echo "Checking npm configuration:"
-          npm config list
-          echo "Checking .npmrc contents:"
-          cat ~/.npmrc || echo "No ~/.npmrc found"
-          cat ./.npmrc || echo "No ./.npmrc found"
-          echo "Checking authentication:"
-          npm whoami --registry https://npm.pkg.github.com
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to GitHub Packages
         run: npm publish --tag ${{ steps.version_info.outputs.TAG }}
         env:
