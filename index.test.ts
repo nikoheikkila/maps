@@ -16,6 +16,12 @@ class TimeSeriesMap<T> extends Map<number, T> {
     this.set(key, data);
     return key;
   }
+
+  public latest(): T {
+    const latestKey = Array.from(this.keys()).at(0);
+
+    return this.get(latestKey);
+  }
 }
 
 describe('Time Series Map', () => {
@@ -43,5 +49,15 @@ describe('Time Series Map', () => {
     map.clear();
 
     expect(map.size).toBe(0);
+  });
+
+  it('retrieves the latest record', () => {
+    const map = new TimeSeriesMap();
+    map.add('data1');
+    map.add('data2');
+
+    const latest = map.latest();
+
+    expect(latest).toBe('data2');
   });
 });
