@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'bun:test';
+import {describe, expect, it} from 'bun:test';
 
 type KeyFunction = () => number;
 
@@ -17,10 +17,14 @@ class TimeSeriesMap<T> extends Map<number, T> {
     return key;
   }
 
-  public latest(): T {
+  public latest(): T | undefined {
+    if (this.size === 0) {
+      throw new Error('map has no records');
+    }
+
     const latestKey = Array.from(this.keys()).at(0);
 
-    return this.get(latestKey);
+    return this.get(latestKey!);
   }
 }
 
@@ -60,4 +64,10 @@ describe('Time Series Map', () => {
 
     expect(latest).toBe('data2');
   });
+
+  it('throws error when retrieving latest record from an empty map', () => {
+    const map = new TimeSeriesMap();
+
+    expect(() => map.latest()).toThrow(/map has no records/i);
+  })
 });
