@@ -12,7 +12,12 @@ class TimeSeriesMap<T> extends Map<number, T> {
   }
 
   public add(data: T): number {
-    const key = this.keyFn();
+    let key = this.keyFn();
+
+    if (this.has(key)) {
+      key++;
+    }
+
     this.set(key, data);
     return key;
   }
@@ -22,9 +27,15 @@ class TimeSeriesMap<T> extends Map<number, T> {
       throw new Error('map has no records');
     }
 
-    const latestKey = Array.from(this.keys()).at(0);
+    const latestKey = Math.max(...this.keys());
 
     return this.get(latestKey!);
+  }
+
+  public earliest(): T | undefined {
+    const earliestKey = Math.min(...this.keys());
+
+    return this.get(earliestKey!);
   }
 }
 
@@ -59,10 +70,11 @@ describe('Time Series Map', () => {
     const map = new TimeSeriesMap();
     map.add('data1');
     map.add('data2');
+    map.add('data3');
 
     const latest = map.latest();
 
-    expect(latest).toBe('data2');
+    expect(latest).toBe('data3');
   });
 
   it('throws error when retrieving latest record from an empty map', () => {
@@ -70,4 +82,13 @@ describe('Time Series Map', () => {
 
     expect(() => map.latest()).toThrow(/map has no records/i);
   })
+
+  it('retrieves the earliest record', () => {
+    const map = new TimeSeriesMap();
+    map.add('data1');
+    map.add('data2');
+    map.add('data3');
+
+    expect(map.earliest()).toBe('data1');
+  });
 });
