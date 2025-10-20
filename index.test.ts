@@ -36,10 +36,14 @@ class TimeSeriesMap<T> extends Map<number, T> {
     if (this.size === 0) {
       throw new Error('map has no records');
     }
-    
+
     const earliestKey = Math.min(...this.keys());
 
     return this.get(earliestKey!);
+  }
+
+  public all(): T[] {
+    return Array.from(this.values());
   }
 }
 
@@ -100,5 +104,13 @@ describe('Time Series Map', () => {
     const map = new TimeSeriesMap();
 
     expect(() => map.earliest()).toThrow(/map has no records/i);
+  })
+
+  it('retrieves all records', () => {
+    const map = new TimeSeriesMap();
+    map.add('data1');
+    map.add('data2');
+
+    expect(map.all()).toStrictEqual(['data1', 'data2']);
   })
 });
