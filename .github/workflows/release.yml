@@ -13,7 +13,7 @@ jobs:
   release:
     name: Release & Publish
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,16 +52,14 @@ jobs:
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
           if [[ "$VERSION" == *"preview"* ]] || [[ "$VERSION" == *"alpha"* ]] || [[ "$VERSION" == *"beta"* ]] || [[ "$VERSION" == *"rc"* ]]; then
-            echo "TAG=preview" >> "$GITHUB_OUTPUT"
             echo "IS_PRERELEASE=true" >> "$GITHUB_OUTPUT"
           else
-            echo "TAG=latest" >> "$GITHUB_OUTPUT"
             echo "IS_PRERELEASE=false" >> "$GITHUB_OUTPUT"
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Publish to GitHub Packages
-        run: npm publish --tag ${{ steps.version_info.outputs.TAG }}
+        run: npm publish --tag ${{ steps.version_info.outputs.VERSION }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
