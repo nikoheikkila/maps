@@ -1,15 +1,60 @@
 {
-	"name": "maps",
-	"module": "index.ts",
+	"name": "@nikoheikkila/maps",
+	"version": "1.0.0",
+	"description": "A TypeScript collection of specialized map implementations for time-series data",
+	"keywords": ["typescript", "map", "timeseries", "data-structures", "bun"],
+	"author": "Niko Heikkilä <niko@nikoheikkila.fi>",
+	"license": "MIT",
+	"homepage": "https://github.com/nikoheikkila/maps#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nikoheikkila/maps.git"
+	},
+	"bugs": {
+		"url": "https://github.com/nikoheikkila/maps/issues"
+	},
 	"type": "module",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist/",
+		"src/",
+		"README.md",
+		"LICENSE"
+	],
+	"engines": {
+		"node": ">=18.0.0",
+		"bun": ">=1.0.0"
+	},
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com",
+		"access": "restricted"
+	},
+	"scripts": {
+		"build": "bun run build:ts && bun run build:bundle",
+		"build:ts": "tsc --project tsconfig.build.json",
+		"build:bundle": "bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.js --target node --format cjs",
+		"test": "bun test",
+		"test:coverage": "bun test --coverage",
+		"lint": "bunx biome check",
+		"format": "bunx biome check --write",
+		"clean": "rm -rf dist coverage",
+		"prepublishOnly": "bun run clean && bun run build && bun run test"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.6",
-		"@types/bun": "latest"
+		"@types/bun": "latest",
+		"typescript": "^5.7.2"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
-	},
-	"scripts": {
-		"format": "bunx biome check --write"
 	}
 }

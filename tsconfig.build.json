@@ -1,0 +1,36 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		// Override for library build
+		"target": "ES2022",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"declaration": true,
+		"declarationMap": true,
+		"sourceMap": true,
+		"outDir": "dist",
+		"noEmit": false,
+		"verbatimModuleSyntax": false,
+		"allowImportingTsExtensions": false,
+
+		// Ensure compatibility
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+
+		// Remove development-only options
+		"noUnusedLocals": true,
+		"noUnusedParameters": true
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"tests/**/*",
+		"**/*.test.ts",
+		"**/*.spec.ts",
+		"node_modules",
+		"dist",
+		"coverage"
+	]
+}

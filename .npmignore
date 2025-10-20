@@ -1,0 +1,37 @@
+# Development and test files
+tests/
+**/*.test.ts
+**/*.spec.ts
+coverage/
+*.lcov
+
+# Configuration files
+.github/
+biome.json
+tsconfig.json
+tsconfig.build.json
+.gitignore
+WARP.md
+
+# Development dependencies
+node_modules/
+bun.lock
+
+# IDE and system files
+.DS_Store
+.idea/
+.vscode/
+.cache/
+.eslintcache
+
+# Logs and temporary files
+logs/
+*.log
+*.tsbuildinfo
+
+# Environment files
+.env*
+
+# Source maps (optional - uncomment to exclude)
+# *.map
+# *.d.ts.map
