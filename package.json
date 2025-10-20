@@ -48,6 +48,7 @@
 		"build": "bun run build:ts && bun run build:bundle",
 		"build:ts": "tsc --project tsconfig.build.json",
 		"build:bundle": "bun build src/index.ts --outfile dist/index.mjs --target node --format esm && bun build src/index.ts --outfile dist/index.js --target node --format cjs",
+		"test": "bun test",
 		"lint": "bunx biome check",
 		"format": "bunx biome check --write",
 		"clean": "rm -rf dist coverage",
