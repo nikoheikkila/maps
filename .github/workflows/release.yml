@@ -47,22 +47,32 @@ jobs:
       - name: Verify package contents
         run: npm pack --dry-run
 
+      - name: Extract version info
+        id: version_info
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          if [[ $VERSION == *"preview"* ]] || [[ $VERSION == *"alpha"* ]] || [[ $VERSION == *"beta"* ]] || [[ $VERSION == *"rc"* ]]; then
+            echo "TAG=preview" >> $GITHUB_OUTPUT
+            echo "IS_PRERELEASE=true" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+            echo "IS_PRERELEASE=false" >> $GITHUB_OUTPUT
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: npm publish --tag ${{ steps.version_info.outputs.TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
       - name: Generate changelog
         id: changelog
         run: |
           if [ -f CHANGELOG.md ]; then
-            CHANGELOG=$(awk "/^## \[?${{ steps.get_version.outputs.VERSION }}\]?/{flag=1; next} /^## \[?[0-9]/{flag=0} flag" CHANGELOG.md)
+            CHANGELOG=$(awk "/^## \[?${{ steps.version_info.outputs.VERSION }}\]?/{flag=1; next} /^## \[?[0-9]/{flag=0} flag" CHANGELOG.md)
           else
-            CHANGELOG="Release ${{ steps.get_version.outputs.VERSION }}"
+            CHANGELOG="Release ${{ steps.version_info.outputs.VERSION }}"
           fi
           echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
@@ -86,7 +96,7 @@ jobs:
             echo "@nikoheikkila:registry=https://npm.pkg.github.com" >> .npmrc
             
             # Install the package
-            npm install @nikoheikkila/maps@${{ steps.get_version.outputs.VERSION }}
+            npm install @nikoheikkila/maps@${{ steps.version_info.outputs.VERSION }}
             ```
             
             ## Verification
@@ -96,4 +106,4 @@ jobs:
             - Node.js: 20
             - All tests passing ✅
           draft: false
-          prerelease: ${{ contains(github.ref, 'preview') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          prerelease: ${{ steps.version_info.outputs.IS_PRERELEASE }}

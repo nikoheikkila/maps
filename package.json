@@ -1,6 +1,6 @@
 {
 	"name": "@nikoheikkila/maps",
-	"version": "1.0.0-preview.1",
+	"version": "1.0.0-preview.2",
 	"description": "A TypeScript collection of specialized map implementations for time-series data",
 	"keywords": [
 		"typescript",
