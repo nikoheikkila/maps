@@ -33,6 +33,10 @@ class TimeSeriesMap<T> extends Map<number, T> {
   }
 
   public earliest(): T | undefined {
+    if (this.size === 0) {
+      throw new Error('map has no records');
+    }
+    
     const earliestKey = Math.min(...this.keys());
 
     return this.get(earliestKey!);
@@ -91,4 +95,10 @@ describe('Time Series Map', () => {
 
     expect(map.earliest()).toBe('data1');
   });
+
+  it('throws error when retrieving earliest record from an empty map', () => {
+    const map = new TimeSeriesMap();
+
+    expect(() => map.earliest()).toThrow(/map has no records/i);
+  })
 });
