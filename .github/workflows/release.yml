@@ -50,15 +50,15 @@ jobs:
       - name: Extract version info
         id: version_info
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          if [[ $VERSION == *"preview"* ]] || [[ $VERSION == *"alpha"* ]] || [[ $VERSION == *"beta"* ]] || [[ $VERSION == *"rc"* ]]; then
-            echo "TAG=preview" >> $GITHUB_OUTPUT
-            echo "IS_PRERELEASE=true" >> $GITHUB_OUTPUT
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "$VERSION" == *"preview"* ]] || [[ "$VERSION" == *"alpha"* ]] || [[ "$VERSION" == *"beta"* ]] || [[ "$VERSION" == *"rc"* ]]; then
+            echo "TAG=preview" >> "$GITHUB_OUTPUT"
+            echo "IS_PRERELEASE=true" >> "$GITHUB_OUTPUT"
           else
-            echo "TAG=latest" >> $GITHUB_OUTPUT
-            echo "IS_PRERELEASE=false" >> $GITHUB_OUTPUT
+            echo "TAG=latest" >> "$GITHUB_OUTPUT"
+            echo "IS_PRERELEASE=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Publish to GitHub Packages
         run: npm publish --tag ${{ steps.version_info.outputs.TAG }}
@@ -70,40 +70,47 @@ jobs:
         id: changelog
         run: |
           if [ -f CHANGELOG.md ]; then
-            CHANGELOG=$(awk "/^## \[?${{ steps.version_info.outputs.VERSION }}\]?/{flag=1; next} /^## \[?[0-9]/{flag=0} flag" CHANGELOG.md)
+            CHANGELOG=$(awk "/^## \\[?${{ steps.version_info.outputs.VERSION }}\\]?/{flag=1; next} /^## \\[?[0-9]/{flag=0} flag" CHANGELOG.md)
           else
             CHANGELOG="Release ${{ steps.version_info.outputs.VERSION }}"
           fi
-          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-          echo "$CHANGELOG" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          {
+            echo "CHANGELOG<<EOF"
+            echo "$CHANGELOG"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
+        run: |
+          RELEASE_BODY="## Changes
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ## Installation
+          
+          \`\`\`bash
+          # Configure GitHub Packages registry
+          echo \"@nikoheikkila:registry=https://npm.pkg.github.com\" >> .npmrc
+          
+          # Install the package
+          npm install @nikoheikkila/maps@${{ steps.version_info.outputs.VERSION }}
+          \`\`\`
+          
+          ## Verification
+          
+          This release was built and tested with:
+          - Bun: Latest
+          - Node.js: 20
+          - All tests passing ✅"
+          
+          if [ "${{ steps.version_info.outputs.IS_PRERELEASE }}" = "true" ]; then
+            gh release create "${{ github.ref_name }}" \
+              --title "${{ github.ref_name }}" \
+              --notes "$RELEASE_BODY" \
+              --prerelease
+          else
+            gh release create "${{ github.ref_name }}" \
+              --title "${{ github.ref_name }}" \
+              --notes "$RELEASE_BODY"
+          fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: |
-            ## Changes
-            ${{ steps.changelog.outputs.CHANGELOG }}
-            
-            ## Installation
-            
-            ```bash
-            # Configure GitHub Packages registry
-            echo "@nikoheikkila:registry=https://npm.pkg.github.com" >> .npmrc
-            
-            # Install the package
-            npm install @nikoheikkila/maps@${{ steps.version_info.outputs.VERSION }}
-            ```
-            
-            ## Verification
-            
-            This release was built and tested with:
-            - Bun: Latest
-            - Node.js: 20
-            - All tests passing ✅
-          draft: false
-          prerelease: ${{ steps.version_info.outputs.IS_PRERELEASE }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
