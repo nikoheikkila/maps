@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+*.tgz
+*.d.ts.map
+*.js.map

@@ -8,6 +8,7 @@ coverage/
 # Configuration files
 .github/
 biome.json
+.biomeignore
 tsconfig.json
 tsconfig.build.json
 .gitignore
